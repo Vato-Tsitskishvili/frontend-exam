@@ -2,20 +2,43 @@ try {
 	fetch("https://fakestoreapi.com/products")
 		.then(response => response.json())
 		.then(data => {
-			const cardsDiv = document.querySelectorAll(".cards");
-			Array.from(data)
-				.slice(0, 4)
-				.forEach(element => {
-					const card = generateProductCard(element);
-					const card2 = generateProductCard(element);
-					Array.from(cardsDiv)[0].appendChild(card);
-					Array.from(cardsDiv)[1].appendChild(card2);
-				});
+			const input = document.getElementById("search-input");
+			let filteredArray = Array.from(data).slice(0, 4);
+
+			renderCards(filteredArray);
+
+			input.addEventListener("input", e => {	
+				filteredArray = filteredArray.filter(element =>
+					element.title
+						.toLowerCase()
+						.includes(e.target.value.toLowerCase())
+				);
+
+				if (e.target.value === "") {
+					filteredArray = Array.from(data).slice(0, 4);
+				}
+
+				renderCards(filteredArray);
+			});
 		})
 		.catch(err => console.log(err));
 } catch (err) {
 	console.log(err);
 }
+
+const cardsDiv = document.querySelectorAll(".cards");
+
+const renderCards = array => {
+	cardsDiv.forEach(div => (div.innerHTML = ""));
+
+	array.forEach(element => {
+		const card = generateProductCard(element);
+		const card2 = generateProductCard(element);
+
+		cardsDiv[0].appendChild(card);
+		cardsDiv[1].appendChild(card2);
+	});
+};
 
 const generateProductCard = data => {
 	const card = document.createElement("div");
